@@ -7,13 +7,18 @@ const songs = [
   { id: "3", title: "Song C" },
 ];
 
+export const sampleSongs = [
+  { id: "1", title: "Sample Song A", file: require("../assets/songs/_sampleRXUFOnjM16U.m4a") },
+  { id: "2", title: "Sample Song B", file: require("../assets/songs/_sampleXoFBtJ3W0es.m4a") },
+];
+
 export default function Index() {
   const router = useRouter();
 
   return (
     <View style={{ flex: 1, padding: 24 }}>
       <FlatList
-        data={songs}
+        data={sampleSongs}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <TouchableOpacity
@@ -25,7 +30,7 @@ export default function Index() {
             onPress={() =>
               router.push({
                 pathname: "./player",
-                params: { id: item.id, title: item.title },
+                params: { id: item.id, title: item.title, file: item.file },
               })
             }
           >
