@@ -17,3 +17,9 @@ $ npx expo start --tunnel
 exp://8dgceea-anonymous-8081.exp.direct
 http://localhost:8081/
 ```
+
+### download youtube
+
+```bash
+$ npm run dl-m4a <URL>
+```
