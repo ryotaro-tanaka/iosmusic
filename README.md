@@ -23,3 +23,9 @@ http://localhost:8081/
 ```bash
 $ npm run dl-m4a <URL>
 ```
+
+### pre build
+
+```bash
+$ node scripts/generateSongList.js
+```

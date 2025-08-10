@@ -10,9 +10,9 @@ export default function Player() {
 
   const playSound = async () => {
     if (file) {
-      if (sound.current) {
-        await sound.current.unloadAsync();
-      }
+      // if (sound.current) {
+      //   await sound.current.unloadAsync();
+      // }
       const { sound: newSound } = await Audio.Sound.createAsync(
         typeof file === "string" ? { uri: file } : file
       );
