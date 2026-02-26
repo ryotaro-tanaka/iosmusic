@@ -9,7 +9,7 @@ React Native + Expo で作成した iOS 音楽アプリ開発用プロジェク�
 - ダークモード対応、カスタムフォント読み込み、ハプティクス、簡易アニメーション実装
 - まだ音楽再生などのドメイン機能は未実装
 
-詳細は `doc/implementation-status.md` を参照してください。
+詳細は `doc/implementation-status.md` を参照してください。開発前の計画整理には `doc/pre-development-planning.md` も利用してください。
 
 ---
 
