@@ -13,6 +13,9 @@
 
 ### 1.1 可能かどうかの技術的な調査（Feasibility）
 
+- 調査結果ドキュメント: `doc/feasibility-investigation-1-1.md`
+- 確定事項: Bare React Native + `react-native-track-player`（制約が少なく要件を満たすため）
+
 - **対象機能ごとに PoC を作る**
   - バックグラウンド再生
   - ロック画面 / コントロールセンター連携
