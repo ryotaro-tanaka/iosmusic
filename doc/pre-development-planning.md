@@ -13,7 +13,7 @@
 
 ### 1.1 可能かどうかの技術的な調査（Feasibility）
 
-- 調査結果ドキュメント: `doc/feasibility-investigation-1-1.md`
+- 調査結果ドキュメント: `doc/research/feasibility-investigation-1-1.md`
 - 確定事項: Bare React Native + `react-native-track-player`（制約が少なく要件を満たすため）
 
 - **対象機能ごとに PoC を作る**
@@ -95,7 +95,7 @@
 
 ### 2.3 最低限の検証シナリオ
 
-- 実行順序の推奨: 「ゲート付きMVP」（詳細: `doc/feasibility-investigation-1-1.md` の「8. 実行方針」）
+- 実行順序の推奨: 「ゲート付きMVP」（詳細: `doc/research/feasibility-investigation-1-1.md` の「8. 実行方針」）
 
 - アプリ前面: 再生/停止/シーク
 - バックグラウンド遷移後: 10分/30分連続再生
