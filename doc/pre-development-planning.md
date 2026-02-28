@@ -144,6 +144,8 @@
 
 ## 5. すぐ使えるチェックリスト
 
+- MVP仕様書の保存先: `doc/mvp-specs/`（M1-1仕様: `doc/mvp-specs/m1-1-spec.md`）
+- 設計方針の意思決定ログ: `doc/architecture-decisions/`
 - [ ] Bare React Native 採用理由が ADR に記録されている
 - [ ] MVP の成功条件が定義されている
 - [ ] 技術 PoC の結果と採用理由が記録されている
