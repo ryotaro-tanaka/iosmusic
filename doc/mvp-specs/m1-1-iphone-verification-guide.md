@@ -2,106 +2,102 @@
 
 最終更新: 2026-02-28
 
-## 1. 結論（先に要点）
+## 1. 先に結論
 
-- **MacBook（macOS + Xcode）は必要**。
-- **iPhoneだけでは不可**（このリポジトリの現状態では、ビルド前に iOS 側実装が必要）。
-- 「cloneして Xcode でビルドしてインストール」だけで済むのは、
-  - iOS プロジェクト（`ios/`）が存在し、
-  - かつ `LocalTrackScanner` ネイティブモジュールが実装済み、
-  の場合のみ。
+- あなたの理解「**Macで clone → Xcodeでビルド → iPhoneへインストール**」は、**ほぼ正しい**。
+- ただし現状は、ビルド前に最低1つだけ前提がある。
+  - JS 側が `LocalTrackScanner` ネイティブモジュールを呼ぶ設計なので、iOS 側実装が必要。
+- その前提がリポジトリに入っていれば、Mac 側作業はほぼ `git clone` とビルドだけで完結する。
 
-## 2. なぜビルド前作業が必要か
+## 2. 個人アプリなら何が不要で、何が必要か
 
-JS 側の実装は `NativeModules.LocalTrackScanner` を必須としており、未登録時はエラーになる。
+### 2.1 不要（配布しない前提）
+
+- App Store 提出向け設定
+- TestFlight 配布設定
+- ストア申請用メタデータ整備
+
+### 2.2 必要（自分のiPhoneに入れるだけでも必要）
+
+- Mac + Xcode
+- Apple ID での署名設定（無料枠でも可）
+- 実機インストールのための Team/Signing 設定
+- iOS ネイティブ実装（`LocalTrackScanner`）
+
+## 3. 「Mac上での追加コーディングは不要」にできるか
+
+結論として、**可能**。ただし条件がある。
+
+- 条件A: `ios/` プロジェクトが repo に含まれている
+- 条件B: `LocalTrackScanner` 実装が repo に含まれている
+
+この2つが満たされれば、Mac 側は「clone してビルド」中心になる。
+
+> 現在の repo には `ios/` が見当たらないため、今のままでは条件Aが未充足。
+
+## 4. なぜ `LocalTrackScanner` 実装が必須か
+
+JS 側実装は `NativeModules.LocalTrackScanner` を前提にしている。
 
 - `scanM4ATracks(targetSubDirectory)`
 - `getTargetDirectoryPath(targetSubDirectory)`
 
-上記2メソッドを iOS ネイティブ側で提供しないと、M1-1 の一覧取得は失敗する。
+このモジュールが未登録だと一覧取得が失敗する。
 
-## 3. 事前チェック（5分）
+## 5. iOS 側の実装要件（最小）
 
-1. リポジトリ直下に `ios/` フォルダがあるか確認
-2. iOS 側に `LocalTrackScanner` 実装があるか確認
-3. Apple Developer 設定（Team / Signing）ができるか確認
+M1-1 仕様に合わせ、ネイティブ側で以下を満たす。
 
-`ios/` がない場合は、まず iOS プロジェクトを作る必要がある（セクション4）。
+- 対象フォルダ: `Documents/<targetSubDirectory>`（想定 `Documents/m4a`）
+- 対象拡張子: `.m4a` / `.M4A`
+- 除外: 0バイト
+- 不正ファイル: スキップ + ログ
+- 並び順: ファイル名昇順
+- 返却: `{ id, title, uri, durationMs }`
 
-## 4. iOS プロジェクトがない場合の準備
+エラー系の扱い:
 
-> 現在のリポジトリは `ios/` フォルダが見当たらないため、この手順が必要な可能性が高い。
+- フォルダ未存在: 空配列 + 警告ログ
+- 読み取り失敗: エラー返却（UI で再読み込み可能）
 
-1. Node / npm / Ruby(CocoaPods) を整える
-2. `npx react-native@0.79.5 init TempApp --skip-install` などで同バージョン雛形を作成
-3. 生成された `ios/` を本リポジトリに取り込む
-4. `npx pod-install ios`
-5. `ios/*.xcworkspace` を Xcode で開く
+## 6. 推奨手順（最短）
 
-> 既存プロジェクトの構成を壊さないよう、別ブランチで作業すること。
+### Step 0: 事前判定
 
-## 5. `LocalTrackScanner` の実装要件（iOS 側）
+1. `ios/` があるか
+2. `LocalTrackScanner` 実装があるか
 
-M1-1 仕様に合わせて、ネイティブ側で以下を実装する。
+### Step 1: 前提が揃っている場合（理想）
 
-### 5.1 入力
+1. `git clone`
+2. `npm install`
+3. `npx pod-install ios`
+4. `ios/*.xcworkspace` を Xcode で開く
+5. Team/Signing を設定
+6. 実機を選んで Build/Run
 
-- `targetSubDirectory`（想定: `m4a`）
+### Step 2: 前提が不足している場合
 
-### 5.2 探索仕様
+- `ios/` がない → 先に iOS プロジェクトを生成して取り込む
+- `LocalTrackScanner` がない → 先に iOS ネイティブモジュールを実装する
 
-- ベースは App Documents ディレクトリ
-- 探索対象は `Documents/<targetSubDirectory>`
-- 拡張子 `.m4a` / `.M4A` を対象
-- 0バイトを除外
-- 読み取り不可・不正ファイルはスキップ + ログ
-- ファイル名昇順で返却
+## 7. M1-1 の実機テスト
 
-### 5.3 返却データ形
+1. `Documents/m4a` を空にして起動し、空状態文言を確認
+2. M4Aを3件配置し、3件表示を確認
+3. 「再読み込み」を3回押して件数一致を確認
+4. 0バイト M4A が一覧に出ないことを確認
 
-各要素に最低限以下を含める。
+## 8. よくある誤解への回答
 
-- `id`: 一意（例: フルパス）
-- `title`: ファイル名
-- `uri`: `file://` 付きパス
-- `durationMs`: `null` 可
+### Q. 「個人アプリなら Xcode 設定は不要？」
 
-### 5.4 エラー時
+- いいえ。実機インストール時の署名設定は必要。
 
-- フォルダ未存在: 空配列を返し警告ログ
-- 読み取り失敗: エラーを返す（UI側でエラーメッセージ表示）
+### Q. 「iPhoneだけで完結できる？」
 
-## 6. Xcode でのビルド〜実機インストール
+- いいえ。iOS ネイティブ実装とビルドには通常 Mac + Xcode が必要。
 
-1. Mac に iPhone を接続
-2. `ios/*.xcworkspace` を Xcode で開く
-3. Target > Signing & Capabilities で Team を設定
-4. Bundle Identifier をユニーク値に調整（必要なら）
-5. 実機を Run Destination に選択
-6. Product > Build
-7. Product > Run でインストール
-8. 初回は iPhone 側で開発者信頼を許可
+### Q. 「今ここで実装しておけば、Macでは clone とビルドだけで済む？」
 
-## 7. M1-1 手動テスト手順（実機）
-
-1. `Documents/m4a` を空にして起動
-   - 「再生可能なM4Aファイルが見つかりません」を確認
-2. 同フォルダに M4A を3件入れて再起動または「再読み込み」
-   - 3件表示されることを確認
-3. 「再読み込み」を3回連続実行
-   - 件数が毎回一致することを確認
-4. 0バイトの `.m4a` を配置
-   - 一覧に出ないことを確認
-
-## 8. よくある詰まりポイント
-
-- `No such module` / Build error: Pod 未導入 or Xcode バージョン不一致
-- `NativeModules.LocalTrackScanner` が undefined: ネイティブ実装未登録
-- 実機に入らない: Signing / Provisioning 設定不足
-- ファイルが出ない: 配置先が `Documents/m4a` 以外
-
-## 9. 追加メモ（運用上のおすすめ）
-
-- 実機確認用に M4A テストデータ（0件/3件/0バイト）を固定化する
-- ログ（対象フォルダ、除外件数、最終件数）を毎回確認する
-- M1-1 完了判定は DoD に沿って記録を残す
+- はい、**repo に `ios/` と `LocalTrackScanner` 実装まで含めれば**その運用に近づける。
