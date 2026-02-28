@@ -4,14 +4,15 @@
 
 ## 1. 概要
 
-`doc/mvp-specs/m1-1-spec.md` の実装開始前に、既存の Expo テンプレート由来実装を削除しました。
+`doc/pre-development-planning.md` の方針に合わせ、プロジェクト基盤を **Bare React Native（Expo不使用）** にリセットしました。
 
 ## 2. 現在の状態
 
-- 既存のタブ画面、サンプルUIコンポーネント、テーマ/フォント読み込みなどは削除済み。
-- ルーティングは最小構成（`app/_layout.tsx`, `app/index.tsx`, `app/+not-found.tsx`）のみ。
+- Expo Router / Expo 固有実装は削除済み。
+- エントリポイントは `index.js` + `App.tsx` の最小構成。
+- 依存関係は Bare React Native の最小構成へ整理済み。
 - 音楽アプリ機能（M4A検出・一覧表示・再読み込み等）は未実装。
 
 ## 3. 次に実施すること
 
-- `doc` 配下の設計方針に従い、`doc/mvp-specs/m1-1-spec.md` を新規実装する。
+- `doc/mvp-specs/m1-1-spec.md` に従って、M4A検出と曲一覧表示を実装する。
