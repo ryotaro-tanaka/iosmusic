@@ -26,3 +26,4 @@
 ## 既存仕様
 
 - `m1-1-spec.md`: 曲一覧表示（ローカルM4A検出）
+- `m1-1-iphone-verification-guide.md`: M1-1 を iPhone 実機で確認するための手順書
